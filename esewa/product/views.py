@@ -13,4 +13,8 @@ def home(request):
     items={
         'product':product
     }
-    return render(request, 'index.html', items)
+    return render(request, 'product/index.html', items)
+
+
+def productpage(request):
+    return render(request, 'product/productpage.html')
