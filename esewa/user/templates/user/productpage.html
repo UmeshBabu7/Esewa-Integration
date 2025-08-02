@@ -4,8 +4,38 @@
 
 {% comment %} product list {% endcomment %}
 <div class="p-4 mx-auto lg:max-w-6xl md:max-w-4xl">
-      <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-6 sm:mb-8">Product List</h2>
+  <div class="flex justify-between">
+    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 mb-6 sm:mb-8">Product List</h2>
+    {% comment %} search section {% endcomment %}
+     {% comment %} <form action="" method="get" class="search_form">
+    {{product_filter.form.as_p}}
+    <button class="px-3 py-2 bg-blue-500 text-white rounded">Search</button>
+  </form> {% endcomment %}
+<form action="" method="get" style="max-width: 500px; margin: 20px auto;" class="search_form">
+  <p style="display: flex; align-items: center; gap: 10px;">
+    <label for="id_product_name_contains" style="display: none;">
+      Product name contains:
+    </label>
+    <input
+      type="text"
+      name="product_name_contains"
+      id="id_product_name_contains"
+      style="flex: 1; border-radius: 10px; padding: 8px 12px; border: 1px solid #ccc; font-size: 14px;"
+    >
+    <button
+      type="submit"
+      style="padding: 10px 15px; background-color: #3b82f6; color: white; border: none; border-radius: 5px; font-weight: bold; cursor: pointer;"
+      onmouseover="this.style.backgroundColor='#2563eb'"
+      onmouseout="this.style.backgroundColor='#3b82f6'"
+    >
+      Search
+    </button>
+  </p>
+</form>
 
+
+
+  </div> 
       <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {% for p in product %}
         <div class="bg-white flex flex-col rounded-sm overflow-hidden shadow-md hover:scale-[1.01] transition-all relative">
