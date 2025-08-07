@@ -31,7 +31,10 @@ def login_user(request):
 
             if user is not None:
                 login(request, user)
-                return redirect('homepage')
+                if user.is_staff:
+                    return redirect('admins')
+                else:
+                    return redirect('homepage')
             else:
                messages.add_message(request, messages.ERROR, 'Please provide correct credential !')
     else:
