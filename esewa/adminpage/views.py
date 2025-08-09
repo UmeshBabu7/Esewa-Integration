@@ -2,17 +2,22 @@ from django.shortcuts import render, redirect
 from product.models import *
 from product.forms import *
 from django.contrib import messages
+from user.auth import *
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+@admin_only
 def adminhome(request):
     return render(request, 'adminpage/dashboard.html')
 
+@admin_only
 def productlist(request):
     product=Product.objects.all()
     return render(request, 'adminpage/productlist.html', {'product':product})
 
-
+@login_required
+@admin_only
 def addproduct(request):
     if request.method == 'POST':
         form=ProductForm(request.POST)
@@ -28,10 +33,12 @@ def addproduct(request):
 
 
 # Category
+@admin_only
 def categorylist(request):
     category=Category.objects.all()
     return render(request, 'adminpage/categorylist.html', {'category':category})
 
+@admin_only
 def addcategory(request):
     if request.method == 'POST':
         form=CategoryForm(request.POST)
