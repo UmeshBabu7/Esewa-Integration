@@ -14,6 +14,7 @@ def adminhome(request):
 @admin_only
 def productlist(request):
     product=Product.objects.all()
+    messages.add_message(request, messages.SUCCESS, 'Added product successfully in a cart')
     return render(request, 'adminpage/productlist.html', {'product':product})
 
 @login_required

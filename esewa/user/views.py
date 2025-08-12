@@ -6,6 +6,8 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages
 from .forms import LoginForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 def register_user(request):
@@ -70,3 +72,27 @@ def productdetail(request, product_id):
         'product':product
     }
     return render(request, 'user/productdetail.html', data)
+
+
+@login_required
+def add_to_cart(request, product_id):
+    user=request.user
+    product=Product.objects.get(id=product_id)
+
+    check_items=Cart.objects.filter(user=user, product=product)
+    if check_items:
+        messages.add_message(request, messages.ERROR, 'Product is already added in a cart')
+        return redirect('productpage')
+    else:
+        Cart.objects.create(user=user, product=product)
+        messages.add_message(request, messages.SUCCESS, 'Added product successfully in a cart')
+        return redirect('cartlist')
+
+
+def cart_list(request):
+    user=request.user
+    items=Cart.objects.filter(user=user)
+    data={
+        'items':items
+    }
+    return render(request, 'user/cart.html', data)
