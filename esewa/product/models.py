@@ -32,7 +32,7 @@ class Cart(models.Model):
 
 class Order(models.Model):
     PAYMENT_METHOD=(
-        ('Cash on delivery', 'Cash on Delivery'),
+        ('Cash on Delivery', 'Cash on Delivery'),
         ('Esewa', 'Esewa'),
         ('Khalti', 'Khalti')
     )
