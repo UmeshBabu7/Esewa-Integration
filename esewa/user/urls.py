@@ -22,7 +22,9 @@ urlpatterns = [
 
     # for esewa form
     path('esewa', views.EsewaView.as_view(), name='esewaform'),
-    path('esewa/success/', views.EsewaSuccessView.as_view(), name='esewa_success'),
-    path('esewa/failure/', views.EsewaFailureView.as_view(), name='esewa_failure')
+    path('esewaverify/<int:order_id>/<int:cart_id>/', views.esewa_verify, name='esewaverify'),
+
+    # user profile
+    path('profile/', views.user_profile, name='profile'),
 
 ]

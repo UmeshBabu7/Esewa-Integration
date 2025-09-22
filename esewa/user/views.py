@@ -148,7 +148,7 @@ def orderitem(request, product_id, cart_id):
             messages.add_message(request, messages.SUCCESS, 'Order has been successfully. Be ready with cash')
             return redirect('cartlist')
         elif order.payment_method == 'Esewa':
-            return redirect(reverse('esewaform')+'?o_id='+str(order.id)+'&c_id='+str(cart.id))
+            return redirect(reverse('esewaform')+"?o_id="+str(order.id)+"&c_id="+str(cart.id))
         elif order.payment_method == 'Khalti':
             pass
         else:
@@ -197,18 +197,16 @@ class EsewaView(View):
             return signature
         
         secret_key='8gBm/:&EnhH.1/q'
-        # Correct format for eSewa signature: total_amount,transaction_uuid,product_code
         data_to_sign=f"total_amount={order.total_price},transaction_uuid={uuid_val},product_code=EPAYTEST"
 
         result=genSha256(secret_key, data_to_sign)
 
         data={
-            'amount':order.total_price,  # Use total_amount, not product_price
+            'amount':order.product.product_price,  
             'total_amount':order.total_price,
             'transaction_uuid':uuid_val,
             'product_code':'EPAYTEST',
             'signature':result,
-            'oid':order.id,  # Add order ID
         }
         context={
             'order':order,
@@ -218,30 +216,44 @@ class EsewaView(View):
         return render(request, 'user/esewa_payment.html',context)
 
 
-class EsewaSuccessView(View):
-    def get(self, request, *args, **kwargs):
-        # Handle successful payment
-        oid = request.GET.get('oid')
-        amt = request.GET.get('amt')
-        refId = request.GET.get('refId')
-        
-        if oid and amt and refId:
-            try:
-                order = Order.objects.get(id=oid)
-                order.payment_status = 'completed'
-                order.save()
-                messages.add_message(request, messages.SUCCESS, f'Payment successful! Reference ID: {refId}')
-                return redirect('myorder')
-            except Order.DoesNotExist:
-                messages.add_message(request, messages.ERROR, 'Order not found')
+import json
+@login_required
+def esewa_verify(request, order_id, cart_id):
+    if request.method =='GET':
+        data=request.GET.get('data')
+        decoded_data=base64.b64decode(data).decode('utf-8')
+        map_data=json.loads(decoded_data)
+        order=Order.objects.get(id=order_id)
+        cart=Cart.objects.get(id=cart_id)
+
+        if map_data.get('status') == 'COMPLETE':
+            order.payment_status = 'completed'
+            order.save()
+            cart.delete()
+            messages.add_message(request, messages.SUCCESS, 'Payment Successful')
+            return redirect('myorder')
         else:
-            messages.add_message(request, messages.ERROR, 'Invalid payment response')
-        
-        return redirect('myorder')
+            messages.add_message(request, messages.ERROR, 'Failed to make a payment')
+            return redirect('myorder')
 
 
-class EsewaFailureView(View):
-    def get(self, request, *args, **kwargs):
-        # Handle failed payment
-        messages.add_message(request, messages.ERROR, 'Payment failed. Please try again.')
-        return redirect('cartlist')
+
+@login_required
+def user_profile(request):
+    user = request.user
+    if request.method == 'POST':
+        new_username = request.POST.get('username', '').strip()
+        new_email = request.POST.get('email', '').strip()
+
+        if new_username:
+            user.username = new_username
+        if new_email:
+            user.email = new_email
+        user.save()
+        messages.add_message(request, messages.SUCCESS, 'Profile updated successfully')
+        return redirect('profile')
+
+    data = {
+        'user': user
+    }
+    return render(request, 'user/profile.html', data)
