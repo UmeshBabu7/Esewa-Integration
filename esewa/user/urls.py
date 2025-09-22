@@ -18,6 +18,11 @@ urlpatterns = [
     path('cartlist/', views.cart_list, name='cartlist'),
 
     path('order/<int:product_id>/<int:cart_id>/', views.orderitem, name='order'),
-    path('myorder/', views.orderlist, name='myorder')
+    path('myorder/', views.orderlist, name='myorder'),
+
+    # for esewa form
+    path('esewa', views.EsewaView.as_view(), name='esewaform'),
+    path('esewa/success/', views.EsewaSuccessView.as_view(), name='esewa_success'),
+    path('esewa/failure/', views.EsewaFailureView.as_view(), name='esewa_failure')
 
 ]

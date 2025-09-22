@@ -7,6 +7,8 @@ from django.contrib import messages
 from .forms import LoginForm, OrderForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.views import View
+from django.urls import reverse
 
 
 # Create your views here.
@@ -51,7 +53,11 @@ def logout_user(request):
 def homepage(request):
     user=request.user
     product=Product.objects.all().order_by('-id')[:4]
-    items=Cart.objects.filter(user=user)
+    # Only filter cart items if user is authenticated
+    if user.is_authenticated:
+        items=Cart.objects.filter(user=user)
+    else:
+        items=Cart.objects.none()  # Return empty queryset for anonymous users
     data={
         'product':product,
         'items':items
@@ -61,7 +67,11 @@ def homepage(request):
 
 def productpage(request):
     user=request.user
-    items=Cart.objects.filter(user=user)
+    # Only filter cart items if user is authenticated
+    if user.is_authenticated:
+        items=Cart.objects.filter(user=user)
+    else:
+        items=Cart.objects.none()  # Return empty queryset for anonymous users
     product=Product.objects.all()
     # For Filter Product
     product_filter=ProductFilter(request.GET, queryset=product)
@@ -138,7 +148,7 @@ def orderitem(request, product_id, cart_id):
             messages.add_message(request, messages.SUCCESS, 'Order has been successfully. Be ready with cash')
             return redirect('cartlist')
         elif order.payment_method == 'Esewa':
-            pass
+            return redirect(reverse('esewaform')+'?o_id='+str(order.id)+'&c_id='+str(cart.id))
         elif order.payment_method == 'Khalti':
             pass
         else:
@@ -159,3 +169,79 @@ def orderlist(request):
         'order':order
     }
     return render(request, 'user/myorder.html', data)
+
+
+import hmac #cryptography algorithm
+import hashlib #encrypt data
+import uuid #to generate random string
+import base64
+
+class EsewaView(View):
+    def get(self, request, *args, **kwargs):
+        o_id=request.GET.get('o_id')
+        c_id=request.GET.get('c_id')
+        cart=Cart.objects.get(id=c_id)
+        order=Order.objects.get(id=o_id)
+
+        uuid_val=uuid.uuid4()
+
+        def genSha256(key, message):
+            key=key.encode('utf-8')
+            message=message.encode('utf-8')
+
+            hmac_sha256=hmac.new(key,message, hashlib.sha256)
+
+            digest=hmac_sha256.digest()
+
+            signature=base64.b64encode(digest).decode('utf-8')
+            return signature
+        
+        secret_key='8gBm/:&EnhH.1/q'
+        # Correct format for eSewa signature: total_amount,transaction_uuid,product_code
+        data_to_sign=f"total_amount={order.total_price},transaction_uuid={uuid_val},product_code=EPAYTEST"
+
+        result=genSha256(secret_key, data_to_sign)
+
+        data={
+            'amount':order.total_price,  # Use total_amount, not product_price
+            'total_amount':order.total_price,
+            'transaction_uuid':uuid_val,
+            'product_code':'EPAYTEST',
+            'signature':result,
+            'oid':order.id,  # Add order ID
+        }
+        context={
+            'order':order,
+            'data':data,
+            'cart':cart
+        }
+        return render(request, 'user/esewa_payment.html',context)
+
+
+class EsewaSuccessView(View):
+    def get(self, request, *args, **kwargs):
+        # Handle successful payment
+        oid = request.GET.get('oid')
+        amt = request.GET.get('amt')
+        refId = request.GET.get('refId')
+        
+        if oid and amt and refId:
+            try:
+                order = Order.objects.get(id=oid)
+                order.payment_status = 'completed'
+                order.save()
+                messages.add_message(request, messages.SUCCESS, f'Payment successful! Reference ID: {refId}')
+                return redirect('myorder')
+            except Order.DoesNotExist:
+                messages.add_message(request, messages.ERROR, 'Order not found')
+        else:
+            messages.add_message(request, messages.ERROR, 'Invalid payment response')
+        
+        return redirect('myorder')
+
+
+class EsewaFailureView(View):
+    def get(self, request, *args, **kwargs):
+        # Handle failed payment
+        messages.add_message(request, messages.ERROR, 'Payment failed. Please try again.')
+        return redirect('cartlist')
