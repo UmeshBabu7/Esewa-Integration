@@ -2,6 +2,8 @@
 {% load crispy_forms_tags %}
 {% block content %}
 
+{% include 'product/carousel.html' %}
+
 <span class="animate-spin"><i class="bi biarrow-clockwise animate-spin fa-spin"></i></span><h2 class="text-center text-2xl"> Processing </h2>
 
  <form action="https://rc-epay.esewa.com.np/api/epay/main/v2/form" method="POST" id='esewaform'>
