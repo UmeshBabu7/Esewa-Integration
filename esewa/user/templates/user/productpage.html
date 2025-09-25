@@ -27,7 +27,7 @@
     <a href="{% url 'productdetail' p.id %}" class="block">
       <div class="bg-white flex flex-col rounded-sm overflow-hidden shadow-md hover:scale-[1.01] transition-all relative">
         <div class="w-full">
-          <img src="{{p.image}}" alt="{{p.product_name}}"
+          <img src="{{p.image.url}}" alt="{{p.product_name}}"
             class="w-full aspect-[18/24] object-cover object-top" />
         </div>
         <div class="p-4">

@@ -58,10 +58,11 @@
                     {{p.description}}
                 </td>
                   <td class="px-6 py-4">
-                    <img src="{{p.image}}" alt="{{p.product_name}}" width="100px">
+                    <img src="{{p.image.url}}" alt="{{p.product_name}}" width="100px">
                 </td>
                 <td class="px-6 py-4">
-                    <a href="#" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="{% url 'updateproduct' p.id %}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">Edit</a>
+                    <a href="{% url 'deleteproduct' p.id %}" class="font-medium text-blue-600 dark:text-red-500 hover:underline">Delete</a>
                 </td>
             </tr>
             {% endfor %}
