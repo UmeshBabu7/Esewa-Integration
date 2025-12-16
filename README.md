@@ -3,8 +3,8 @@
 An example e‑commerce app built with Django that integrates the eSewa ePay V2 checkout flow. Users can browse products, add to cart, place orders, and pay via eSewa (RC test gateway) or Cash on Delivery.
 
 ### Tech stack
-- **Backend**: Django 5
-- **DB**: SQLite (dev)
+- **Backend**: Django
+- **DB**: SQLite
 - **UI**: Django templates, Tailwind via `crispy-forms` + `crispy-tailwind`
 - **Filters**: `django-filter`
 
@@ -13,10 +13,6 @@ An example e‑commerce app built with Django that integrates the eSewa ePay V2 
 - `user`: Auth (register/login), cart, order, profile, Esewa payment flow
 - `adminpage`: Simple admin dashboards and product/category management
 - `esewa`: Project settings, URLs
-
-### Prerequisites
-- Python 3.10+
-- PowerShell (Windows) or a POSIX shell
 
 ### Installation
 1) Clone or download the repository
