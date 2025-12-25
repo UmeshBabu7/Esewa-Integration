@@ -1,6 +1,6 @@
 ### Esewa-Integration (Django)
 
-An example e‑commerce app built with Django that integrates the eSewa ePay V2 checkout flow. Users can browse products, add to cart, place orders, and pay via eSewa (RC test gateway) or Cash on Delivery.
+Esewa-Integration is a Django e-commerce app with eSewa payment integration. Users can register, browse products with search/filter, view details, add to cart, place orders, and pay via eSewa (RC test) or Cash on Delivery. They can view order history and manage their profile. Admins have a dashboard to manage products (add, update, delete) and categories (add, update, delete), with staff-only access.
 
 ### Tech stack
 - **Backend**: Django
